@@ -166,6 +166,7 @@ $$("[data-cta]").forEach((el) => {
 /* ============================================================
    Integration Inspector (drawer)
    ============================================================ */
+const devMode = new URLSearchParams(location.search).get("dev") === "1";
 const inspector = document.createElement("aside");
 inspector.className = "inspector";
 inspector.setAttribute("aria-label", "Integration Inspector");
@@ -255,6 +256,7 @@ function closeInspector() {
 }
 const inspToggle = $("#inspector-toggle");
 if (inspToggle) {
+  inspToggle.classList.toggle("is-visible", devMode);
   inspToggle.addEventListener("click", () =>
     inspector.classList.contains("open") ? closeInspector() : openInspector()
   );
@@ -270,6 +272,7 @@ $('[data-action="clear"]', inspector).addEventListener("click", () => {
    ============================================================ */
 const launcher = $("#chat-launcher");const panel = document.createElement("section");
 panel.className = "chat-panel";
+panel.id = "chat-panel";
 panel.hidden = true;
 panel.setAttribute("role", "dialog");
 panel.setAttribute("aria-label", "Harbourline Assistant");
@@ -294,16 +297,33 @@ const chatInput = $("#chat-input", panel);
 let chatStarted = false;
 let chatAnswers = {};
 
+function openChat() {
+  panel.hidden = false;
+  if (launcher) launcher.setAttribute("aria-expanded", "true");
+  if (!chatStarted) {
+    chatStarted = true;
+    startChat();
+  } else if (!chatBody.children.length) {
+    botSay("Hi! I'm the <strong>Harbourline Assistant</strong>. Ask me about first home loans, refinancing or booking a call.");
+  }
+}
+function closeChat() {
+  panel.hidden = true;
+  if (launcher) launcher.setAttribute("aria-expanded", "false");
+}
+
 if (launcher) {
+  launcher.setAttribute("aria-expanded", "false");
+  launcher.setAttribute("aria-controls", panel.id);
   launcher.addEventListener("click", () => {
-    panel.hidden = !panel.hidden;
-    if (!panel.hidden && !chatStarted) {
-      chatStarted = true;
-      startChat();
-    }
+    if (panel.hidden) openChat();
+    else closeChat();
   });
 }
-$(".chat-head button", panel).addEventListener("click", () => { panel.hidden = true; });
+$(".chat-head button", panel).addEventListener("click", () => {
+  closeChat();
+  if (launcher) launcher.focus();
+});
 
 function botSay(html, cb) {
   const div = document.createElement("div");
