@@ -306,10 +306,21 @@ input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--teal
   display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line);
 }
 .chat-panel[hidden] { display: none; }
+/* The panel is a <section>: stop the page section padding from adding blank bands. */
+section.chat-panel { padding: 0; }
+/* While the panel is open, the launcher shows a close mark. */
+.chat-launcher { z-index: 72; }
+.chat-launcher[aria-expanded="true"] svg { display: none; }
+.chat-launcher[aria-expanded="true"]::after { content: "\00D7"; font-size: 2rem; line-height: 1; font-weight: 400; }
 .chat-head { background: var(--navy); color: var(--white); padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
 .chat-head strong { flex: 1; font-size: 0.95rem; }
 .chat-head .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); }
-.chat-head button { background: none; border: 0; color: #8DA0BC; font-size: 1.3rem; cursor: pointer; line-height: 1; }
+.chat-head button {
+  background: rgba(255, 255, 255, 0.12); border: 0; border-radius: 8px; color: var(--white);
+  font-size: 0.85rem; font-weight: 700; cursor: pointer; line-height: 1;
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px;
+}
+.chat-head button span { font-size: 1.4rem; font-weight: 400; }
 .chat-body { flex: 1; overflow-y: auto; padding: 14px; background: var(--sand); display: flex; flex-direction: column; gap: 10px; }
 .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.45; }
 .chat-msg.bot { background: var(--white); color: var(--ink); border-bottom-left-radius: 4px; align-self: flex-start; box-shadow: 0 1px 3px rgba(11, 37, 69, 0.08); }
@@ -408,7 +419,8 @@ input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--teal
   .hero { padding: 56px 0; }
   .sticky-cta { display: flex; }
   body { padding-bottom: 56px; }
-  .chat-panel { bottom: 66px; height: 62vh; }
+  /* Sit above the launcher, and use the visible viewport height on iOS. */
+  .chat-panel { bottom: 128px; height: min(480px, calc(100dvh - 128px - 90px)); max-height: none; }
   .chat-launcher { bottom: 64px; right: 12px; width: 52px; height: 52px; }
   .chat-head button {
     min-width: 44px; min-height: 44px; padding: 10px;

@@ -280,7 +280,7 @@ panel.innerHTML = `
   <div class="chat-head">
     <span class="dot" aria-hidden="true"></span>
     <strong>Harbourline Assistant</strong>
-    <button type="button" aria-label="Close chat">&times;</button>
+    <button type="button" aria-label="Close chat">Close <span aria-hidden="true">&times;</span></button>
   </div>
   <div class="chat-body" id="chat-body" aria-live="polite"></div>
   <div class="chat-input-row" id="chat-input-row" hidden>
@@ -323,6 +323,19 @@ if (launcher) {
 $(".chat-head button", panel).addEventListener("click", () => {
   closeChat();
   if (launcher) launcher.focus();
+});
+// Close on Escape, or on a tap outside the panel and the launcher.
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !panel.hidden) closeChat();
+});
+// pointerdown, not click: iOS Safari sends no click for a tap on plain content.
+document.addEventListener("pointerdown", (e) => {
+  if (panel.hidden) return;
+  // composedPath() is fixed at dispatch, so it still works when a quick-reply
+  // button removes itself from the DOM during the click.
+  const path = e.composedPath();
+  if (path.includes(panel) || (launcher && path.includes(launcher))) return;
+  closeChat();
 });
 
 function botSay(html, cb) {
